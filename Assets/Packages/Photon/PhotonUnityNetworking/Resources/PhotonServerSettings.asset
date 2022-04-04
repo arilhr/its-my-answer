@@ -17,10 +17,10 @@ MonoBehaviour:
     AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
-    AppVersion: 
+    AppVersion: 0.1
     UseNameServer: 1
     FixedRegion: 
-    Server: asia
+    Server: 
     Port: 0
     ProxyServer: 
     Protocol: 0
@@ -36,6 +36,9 @@ MonoBehaviour:
   RpcList:
   - ClickRpc
   - DestroyRpc
+  - OnDropped
+  - OnPicked
+  - OnChangeKinematic
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
