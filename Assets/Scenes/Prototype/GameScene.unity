@@ -227,6 +227,7 @@ GameObject:
   - component: {fileID: 272259574}
   - component: {fileID: 272259573}
   - component: {fileID: 272259575}
+  - component: {fileID: 272259576}
   m_Layer: 0
   m_Name: CM FreeLook1
   m_TagString: Untagged
@@ -366,6 +367,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 1249627874}
   cinemachineCamera: {fileID: 272259573}
+--- !u!114 &272259576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272259572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb7194dc27b9df64c8beca7482ee8e0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerIndex: -1
+  XYAxis: {fileID: -6461661904216207381, guid: 8982ca1462422fb409e793233414099c, type: 3}
+  ZAxis: {fileID: -6461661904216207381, guid: 8982ca1462422fb409e793233414099c, type: 3}
 --- !u!1 &430690280
 GameObject:
   m_ObjectHideFlags: 3
@@ -668,7 +684,7 @@ GameObject:
   - component: {fileID: 1088618308}
   - component: {fileID: 1088618307}
   - component: {fileID: 1088618306}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1404,7 +1420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b355673db0d5745874bccdc6604c84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 5717307478041345758, guid: 01809d01b2fbdc24fbb8766c1ca52708, type: 3}
+  playerPrefab: {fileID: 818443860507872425, guid: 01809d01b2fbdc24fbb8766c1ca52708, type: 3}
   spawnPoints:
   - {fileID: 801909601}
   - {fileID: 1040363799}

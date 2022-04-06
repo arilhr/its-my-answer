@@ -30,7 +30,7 @@ public class Item : MonoBehaviour, IPickable
         GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.LocalPlayer);
 
         currentCarrier = player;
-        currentPos = player.pickedItemPos;
+        currentPos = player.itemPickedPos;
 
         GetComponent<PhotonView>().RPC("OnChangeKinematic", RpcTarget.All, true);
     }
