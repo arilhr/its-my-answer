@@ -43,7 +43,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public void Play()
     {
-        PhotonNetwork.JoinRandomOrCreateRoom();
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.CleanupCacheOnLeave = false;
+        roomOptions.MaxPlayers = 2;
+        PhotonNetwork.JoinRandomOrCreateRoom(null, 0, MatchmakingMode.FillRoom, null, null, null, roomOptions, null);
     }
 
     public override void OnConnectedToMaster()

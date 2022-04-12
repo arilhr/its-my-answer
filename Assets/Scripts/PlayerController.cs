@@ -1,39 +1,47 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks
 {
     public float moveSpeed = 1f;
     public float maxSpeed = 5f;
     public float jumpForce = 5f;
     public LayerMask groundLayer;
 
+    [Header("Reference")]
     public Transform itemPickedPos;
-    
+    public TMP_Text currentAnswerPickedText;
+
     private float turnSmoothValue;
     private float turnSmoothTime = 0.1f;
 
-    private IPickable itemPicked = null;
+    public int currentAnswer { private set; get; }
+    public AnswerItem currentItemPicked { private set; get; }
     private float pickRayLength = 2f;
 
     private Transform playerCamera;
-    private PlayerInput input;
+    public PlayerInput input { private set; get; }
     private Rigidbody rb;
-    private PhotonView view;
+    private PhotonView pv;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        view = GetComponent<PhotonView>();
+        pv = GetComponent<PhotonView>();
         input = new PlayerInput();
     }
 
-    private void OnEnable()
+    public override void OnEnable()
     {
-        if (view.IsMine)
+        base.OnEnable();
+
+        if (pv.IsMine)
         {
             input.GameControl.Jump.started += Jump;
             input.GameControl.Pick.started += PickItem;
@@ -42,9 +50,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    public override void OnDisable()
     {
-        if (view.IsMine)
+        base.OnDisable();
+
+        if (pv.IsMine)
         {
             input.GameControl.Jump.started -= Jump;
             input.GameControl.Disable();
@@ -53,16 +63,21 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        if (view.IsMine)
+        if (pv.IsMine)
         {
             CameraManager.Instance.SetObjectFollow(transform);
             playerCamera = CameraManager.Instance.mainCamera.transform;
         }
     }
 
+    private void Update()
+    {
+        UpdateAnswerUI();
+    }
+
     private void FixedUpdate()
     {
-        if (!view.IsMine) return;
+        if (!pv.IsMine) return;
 
         Move();
     }
@@ -102,7 +117,6 @@ public class PlayerController : MonoBehaviour
 
     private void Jump(InputAction.CallbackContext ctx)
     {
-
         if (IsGrounded())
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -115,23 +129,64 @@ public class PlayerController : MonoBehaviour
         return (Physics.Raycast(ray, out RaycastHit hit, 0.3f));
     }
 
+    #region Pick and Drop Item
     private void PickItem(InputAction.CallbackContext ctx)
     {
         RaycastHit hit;
         if (Physics.BoxCast(transform.position, Vector3.one * pickRayLength / 2f, transform.forward, out hit, Quaternion.identity, pickRayLength))
         {
+            if (hit.collider.GetComponent<AnswerItem>().isPicked) return;
+
             Debug.Log($"Pick item: {hit.collider.gameObject.name}");
 
-            hit.collider.GetComponent<IPickable>()?.Picked(this);
-            itemPicked = hit.collider.GetComponent<IPickable>();
+            currentItemPicked = hit.collider.GetComponent<AnswerItem>();
+            currentItemPicked.Picked(this);
+
+            int updatedAnswer = hit.collider.GetComponent<AnswerItem>().answer;
+
+            Hashtable currentProps = new Hashtable();
+            currentProps["CurrentAnswer"] = updatedAnswer;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
         }
     }
 
     private void DropItem(InputAction.CallbackContext ctx)
     {
-        if (itemPicked == null) return;
+        if (currentItemPicked == null) return;
 
-        itemPicked.Dropped();
+        currentItemPicked.Dropped();
+
+        Hashtable currentProps = new Hashtable();
+        currentProps["CurrentAnswer"] = -1;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
+    }
+    #endregion
+
+    #region Callback
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
+
+        if (targetPlayer != null && targetPlayer == pv.Owner)
+        {
+            Debug.Log($"{targetPlayer.NickName} props changed");
+        
+            if (targetPlayer.CustomProperties.ContainsKey("CurrentAnswer"))
+            {
+                currentAnswer = (int)targetPlayer.CustomProperties["CurrentAnswer"];
+            }
+        }
+    }
+
+    #endregion
+
+
+    private void UpdateAnswerUI()
+    {
+        if (currentAnswer == -1)
+            currentAnswerPickedText.text = string.Empty;
+        else
+            currentAnswerPickedText.text = $"{currentAnswer}";
     }
 
     private void OnDrawGizmos()

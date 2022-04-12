@@ -39,6 +39,16 @@ MonoBehaviour:
   - OnDropped
   - OnPicked
   - OnChangeKinematic
+  - RpcSetItemAnswer
+  - RpcSetQuestion
+  - CorrectAnswer
+  - FalseAnswer
+  - RpcPickItem
+  - RpcDropItem
+  - RpcUpdateCurrentAnswer
+  - RpcCurrentAnswer
+  - RpcCorrectAnswer
+  - RpcFalseAnswer
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
