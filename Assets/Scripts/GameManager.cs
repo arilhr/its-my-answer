@@ -8,11 +8,14 @@ using Photon.Realtime;
 using TMPro;
 using System;
 using UnityEditor;
-
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
+
+    [Scene]
+    public string menuScene;
 
     [Header("Game Properties")]
     public int scoreToWin = 10;
@@ -74,10 +77,14 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void Update()
     {
+        if (PhotonNetwork.CurrentRoom == null) return;
+
         UpdateCountdownUI();
         UpdatePlayerInfoUI();
         CheckGameEnd();
     }
+
+    #region Callbacks
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
@@ -91,9 +98,21 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+
+        PhotonNetwork.LocalPlayer.SetScore(0);
+        SceneManager.LoadScene(menuScene, LoadSceneMode.Single);
+    }
+
+    #endregion
+
     #region UI
     private void UpdateCountdownUI()
     {
+        if (startTimer == null) return;
+
         int startTimestamp;
         bool timerIsStarting = startTimer.TryGetStartTime(out startTimestamp);
 

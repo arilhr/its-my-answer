@@ -33,6 +33,8 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
 
     public void CheckAnswer(PlayerController answerer, int playerAnswer)
     {
+        Debug.Log($"Check Answer");
+
         if (answer == playerAnswer)
         {
             CorrectAnswer(answerer);
@@ -45,10 +47,26 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
 
     private void CorrectAnswer(PlayerController answerer)
     {
-        SetQuestion(QuestionGenerator.Instance.GetNextQuestion());
-        answerer.photonView.Owner.AddScore(1);
+        Debug.Log($"Local Correct");
 
-        pv.RPC("RpcCorrectAnswer", RpcTarget.All);
+        if (pv.IsMine)
+        {
+            SetQuestion(QuestionGenerator.Instance.GetNextQuestion());
+            answerer.photonView.Owner.AddScore(1);
+
+            pv.RPC("RpcCorrectAnswer", RpcTarget.All);
+        }
+
+        if (answerer.photonView.Owner == pv.Owner)
+        {
+            AnswerItem answerPicked = answerer.currentItemPicked;
+            answerer.DropItem();
+            PhotonNetwork.Destroy(answerPicked.gameObject);
+        }
+        else
+        {
+            pv.RPC("RpcPlayerCorrectAnswer", RpcTarget.Others);
+        }
     }
 
     [PunRPC]
@@ -57,14 +75,53 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
         Debug.Log($"Correct");
     }
 
+    [PunRPC]
+    private void RpcPlayerCorrectAnswer()
+    {
+        Debug.Log($"Player Correct");
+
+        PlayerController player = PlayerController.GetLocalPlayer();
+        AnswerItem answerPicked = player.currentItemPicked;
+
+        player.DropItem();
+        PhotonNetwork.Destroy(answerPicked.gameObject);
+    }
+
     private void FalseAnswer(PlayerController answerer)
     {
-        pv.RPC("RpcFalseAnswer", RpcTarget.All);
+        Debug.Log($"Local False");
+
+        if (pv.IsMine)
+        {
+            pv.RPC("RpcFalseAnswer", RpcTarget.All);
+        }
+
+        if (answerer.photonView.Owner == pv.Owner)
+        {
+            AnswerItem answerItem = answerer.currentItemPicked;
+            answerer.DropItem();
+            answerItem?.RandomizePosition();
+        }
+        else
+        {
+            pv.RPC("RpcPlayerFalseAnswer", RpcTarget.Others);
+        }
     }
 
     [PunRPC]
     private void RpcFalseAnswer()
     {
         Debug.Log($"False");
+    }
+
+    [PunRPC]
+    private void RpcPlayerFalseAnswer()
+    {
+        Debug.Log($"Player False Answer");
+
+        PlayerController player = PlayerController.GetLocalPlayer();
+        AnswerItem answerItem = player.currentItemPicked;
+        player.DropItem();
+        answerItem?.RandomizePosition();
     }
 }

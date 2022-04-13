@@ -11,14 +11,15 @@ public class QuestionArea : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
+            PlayerController player = other.GetComponent<PlayerController>();
+
+            Debug.Log($"Collide with player {player.currentAnswer}");
+
             if (question.pv.IsMine)
             {
-                PlayerController player = other.GetComponent<PlayerController>();
-
-                if (player.currentItemPicked == null) return;
-
                 question.CheckAnswer(player, player.currentAnswer);
             }
+
         }
     }
 }

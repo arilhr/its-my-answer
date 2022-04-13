@@ -25,9 +25,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         inputUsernamePanel.SetActive(true);
         menuPanel.SetActive(false);
-
-        PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonNetwork.ConnectUsingSettings();
     }
 
     public void ConfirmInputUsername()
@@ -46,19 +43,13 @@ public class MenuManager : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.CleanupCacheOnLeave = false;
         roomOptions.MaxPlayers = 2;
-        PhotonNetwork.JoinRandomOrCreateRoom(null, 0, MatchmakingMode.FillRoom, null, null, null, roomOptions, null);
-    }
 
-    public override void OnConnectedToMaster()
-    {
-        Debug.Log($"On connect master");
-        PhotonNetwork.JoinLobby();
+        PhotonNetwork.JoinRandomOrCreateRoom(null, 0, MatchmakingMode.FillRoom, null, null, null, roomOptions, null);
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log($"Join Room");
-        Debug.Log($"{PhotonNetwork.CurrentRoom.Name}");
+        Debug.Log($"Join Room {PhotonNetwork.CurrentRoom.Name}");
 
         roomPanel.SetActive(true);
         menuPanel.SetActive(false);
@@ -72,6 +63,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(3f);
 
+        PhotonNetwork.CurrentRoom.IsOpen = false;
         PhotonNetwork.LoadLevel(gameScene);
     }
 

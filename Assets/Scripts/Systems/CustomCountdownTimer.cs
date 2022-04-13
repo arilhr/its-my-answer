@@ -135,6 +135,9 @@ public class CustomCountdownTimer : MonoBehaviourPunCallbacks
         startTimestamp = PhotonNetwork.ServerTimestamp;
 
         object startTimeFromProps;
+
+        if (PhotonNetwork.CurrentRoom == null) return false;
+
         if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(CountdownStartTimeKey, out startTimeFromProps))
         {
             startTimestamp = (int)startTimeFromProps;

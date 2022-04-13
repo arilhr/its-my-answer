@@ -2,33 +2,51 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
+using UnityEditor;
 
-public class ConnectionManager : MonoBehaviourPunCallbacks
+public class ConnectionManager : SingletonPunCallback<ConnectionManager>
 {
     // Start is called before the first frame update
     void Start()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonNetwork.ConnectUsingSettings();
-        StartCoroutine(CreateRoom());
+
+        ConnectToServer();
     }
 
-    private void Update()
+    public void ConnectToServer()
     {
-        Debug.Log($"{PhotonNetwork.IsConnected}");
+        PhotonNetwork.ConnectUsingSettings();
     }
 
     public override void OnConnectedToMaster()
     {
-        base.OnConnectedToMaster();
+        Debug.Log($"<color=green>On connect master</color>");
 
-        Debug.Log($"Connecting to master..");
+        PhotonNetwork.JoinLobby();
     }
 
-    public IEnumerator CreateRoom()
+    public override void OnDisconnected(DisconnectCause cause)
     {
-        yield return new WaitForSeconds(2f);
+        base.OnDisconnected(cause);
 
-        PhotonNetwork.CreateRoom("Test");
+        Debug.Log($"<color=red>Disconnected from server: {cause}</color>");
+
+        ConnectToServer();
+    }
+}
+
+[CustomEditor(typeof(ConnectionManager))]
+public class ConnectionManagerEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        if (GUILayout.Button("Disconnect"))
+        {
+            PhotonNetwork.Disconnect();
+        }
     }
 }

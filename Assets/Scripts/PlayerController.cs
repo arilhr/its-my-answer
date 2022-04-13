@@ -35,6 +35,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
         rb = GetComponent<Rigidbody>();
         pv = GetComponent<PhotonView>();
         input = new PlayerInput();
+
+        // set default 
+        Hashtable currentProps = new Hashtable();
+        currentProps["CurrentAnswer"] = -1;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
     }
 
     public override void OnEnable()
@@ -44,8 +49,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (pv.IsMine)
         {
             input.GameControl.Jump.started += Jump;
-            input.GameControl.Pick.started += PickItem;
-            input.GameControl.Drop.started += DropItem;
+            input.GameControl.Pick.started += PickItemInput;
+            input.GameControl.Drop.started += DropItemInput;
             input.GameControl.Enable();
         }
     }
@@ -130,7 +135,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
     }
 
     #region Pick and Drop Item
-    private void PickItem(InputAction.CallbackContext ctx)
+    private void PickItemInput(InputAction.CallbackContext ctx)
+    {
+        PickItem();
+    }
+
+    public void PickItem()
     {
         RaycastHit hit;
         if (Physics.BoxCast(transform.position, Vector3.one * pickRayLength / 2f, transform.forward, out hit, Quaternion.identity, pickRayLength))
@@ -150,7 +160,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
         }
     }
 
-    private void DropItem(InputAction.CallbackContext ctx)
+    private void DropItemInput(InputAction.CallbackContext ctx)
+    {
+        DropItem();
+    }
+
+    public void DropItem()
     {
         if (currentItemPicked == null) return;
 
@@ -174,6 +189,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             if (targetPlayer.CustomProperties.ContainsKey("CurrentAnswer"))
             {
                 currentAnswer = (int)targetPlayer.CustomProperties["CurrentAnswer"];
+                Debug.Log($"{targetPlayer.NickName} current answer changed to {currentAnswer}");
             }
         }
     }
@@ -188,6 +204,27 @@ public class PlayerController : MonoBehaviourPunCallbacks
         else
             currentAnswerPickedText.text = $"{currentAnswer}";
     }
+
+    #region Static Function
+    public static PlayerController GetLocalPlayer()
+    {
+        GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject p in playerObjects)
+        {
+            PlayerController player = p.GetComponent<PlayerController>();
+
+            if (player != null)
+            {
+                if (player.photonView.Owner == PhotonNetwork.LocalPlayer)
+                {
+                    return player;
+                }
+            }
+        }
+
+        return null;
+    }
+    #endregion
 
     private void OnDrawGizmos()
     {

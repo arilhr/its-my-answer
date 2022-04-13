@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,4 +25,9 @@ public class UIManager : MonoBehaviour
     public GameObject gameEndPanel;
     public TMP_Text winnerText;
     public Button backButton;
+
+    public void BackMenu()
+    {
+        PhotonNetwork.LeaveRoom();
+    }
 }
