@@ -9,9 +9,11 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
+    [Header("Player Properties")]
     public float moveSpeed = 1f;
     public float maxSpeed = 5f;
     public float jumpForce = 5f;
+    public float punchedForce = 20f;
     public LayerMask groundLayer;
 
     [Header("Reference")]
@@ -20,6 +22,17 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private float turnSmoothValue;
     private float turnSmoothTime = 0.1f;
+
+    [Header("Punch Cast")]
+    public bool punchGizmos = true;
+    public Vector3 punchArea;
+    public Vector3 punchOffset;
+    public float punchMaxDistance;
+    public LayerMask punchLayerMask;
+
+    [Header("Debug")]
+    public bool showPickAnswerArea = false;
+    public bool showPunchArea = false;
 
     public int currentAnswer { private set; get; }
     public AnswerItem currentItemPicked { private set; get; }
@@ -51,6 +64,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             input.GameControl.Jump.started += Jump;
             input.GameControl.Pick.started += PickItemInput;
             input.GameControl.Drop.started += DropItemInput;
+            input.GameControl.Punch.started += PunchInput;
             input.GameControl.Enable();
         }
     }
@@ -62,6 +76,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (pv.IsMine)
         {
             input.GameControl.Jump.started -= Jump;
+            input.GameControl.Pick.started -= PickItemInput;
+            input.GameControl.Drop.started -= DropItemInput;
+            input.GameControl.Punch.started -= PunchInput;
             input.GameControl.Disable();
         }
     }
@@ -128,6 +145,45 @@ public class PlayerController : MonoBehaviourPunCallbacks
         }
     }
 
+    private void PunchInput(InputAction.CallbackContext ctx)
+    {
+        Punch();
+    }
+
+    private void Punch()
+    {
+        pv.RPC("RpcPunch", RpcTarget.Others);
+    }
+
+    [PunRPC]
+    private void RpcPunch()
+    {
+        Debug.Log($"{pv.Owner.NickName} Punching");
+
+        Vector3 centerPos = transform.position + transform.right * punchOffset.x + transform.up * punchOffset.y + transform.forward * punchOffset.z;
+        RaycastHit hit;
+        if (Physics.BoxCast(centerPos, punchArea / 2, transform.forward, out hit, Quaternion.identity, punchMaxDistance, punchLayerMask))
+        {
+            Debug.Log($"Collided {hit.collider.gameObject.name}");
+
+            PlayerController player = hit.collider.gameObject.GetComponent<PlayerController>();
+
+            if (player == null) return;
+
+            player.Punched(transform.forward * punchedForce);
+        }
+
+    }
+
+    public void Punched(Vector3 force)
+    {
+        Debug.Log($"Punched");
+
+        DropItem();
+
+        rb.AddForce(force);
+    }
+
     private bool IsGrounded()
     {
         Ray ray = new Ray(this.transform.position + Vector3.up * 0.25f, Vector3.down);
@@ -145,6 +201,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         RaycastHit hit;
         if (Physics.BoxCast(transform.position, Vector3.one * pickRayLength / 2f, transform.forward, out hit, Quaternion.identity, pickRayLength))
         {
+            if (hit.collider.GetComponent<AnswerItem>() == null) return;
             if (hit.collider.GetComponent<AnswerItem>().isPicked) return;
 
             Debug.Log($"Pick item: {hit.collider.gameObject.name}");
@@ -228,6 +285,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        if (punchGizmos)
+        {
+            Gizmos.color = Color.yellow;
+            Vector3 centerPos = transform.position + transform.right * punchOffset.x + transform.up * punchOffset.y + transform.forward * punchOffset.z;
+            Gizmos.DrawCube(centerPos + transform.forward * punchMaxDistance, punchArea);
+        }
     }
 }

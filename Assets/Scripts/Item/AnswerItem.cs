@@ -74,6 +74,17 @@ public class AnswerItem : MonoBehaviour, IPickable
         isPicked = cond;
     }
 
+    public void SetItemActive(bool cond)
+    {
+        pv.RPC("RpcItemActive", RpcTarget.All, cond);
+    }
+
+    [PunRPC]
+    private void RpcItemActive(bool cond)
+    {
+        gameObject.SetActive(cond);
+    }
+
     public void RandomizePosition()
     {
         transform.position = QuestionGenerator.Instance.GetRandomSpawnAnswerPos();

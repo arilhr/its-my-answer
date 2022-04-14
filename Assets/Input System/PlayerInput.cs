@@ -57,6 +57,14 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Punch"",
+                    ""type"": ""Button"",
+                    ""id"": ""ff42cead-2a4c-46e7-9722-a1fdb71356a5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -158,6 +166,17 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""action"": ""Drop"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8d0c388e-7279-472e-b31b-a69be2efa9ba"",
+                    ""path"": ""<Mouse>/forwardButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Punch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -171,6 +190,7 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         m_GameControl_Look = m_GameControl.FindAction("Look", throwIfNotFound: true);
         m_GameControl_Pick = m_GameControl.FindAction("Pick", throwIfNotFound: true);
         m_GameControl_Drop = m_GameControl.FindAction("Drop", throwIfNotFound: true);
+        m_GameControl_Punch = m_GameControl.FindAction("Punch", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -225,6 +245,7 @@ public class @PlayerInput : IInputActionCollection, IDisposable
     private readonly InputAction m_GameControl_Look;
     private readonly InputAction m_GameControl_Pick;
     private readonly InputAction m_GameControl_Drop;
+    private readonly InputAction m_GameControl_Punch;
     public struct GameControlActions
     {
         private @PlayerInput m_Wrapper;
@@ -234,6 +255,7 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         public InputAction @Look => m_Wrapper.m_GameControl_Look;
         public InputAction @Pick => m_Wrapper.m_GameControl_Pick;
         public InputAction @Drop => m_Wrapper.m_GameControl_Drop;
+        public InputAction @Punch => m_Wrapper.m_GameControl_Punch;
         public InputActionMap Get() { return m_Wrapper.m_GameControl; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -258,6 +280,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                 @Drop.started -= m_Wrapper.m_GameControlActionsCallbackInterface.OnDrop;
                 @Drop.performed -= m_Wrapper.m_GameControlActionsCallbackInterface.OnDrop;
                 @Drop.canceled -= m_Wrapper.m_GameControlActionsCallbackInterface.OnDrop;
+                @Punch.started -= m_Wrapper.m_GameControlActionsCallbackInterface.OnPunch;
+                @Punch.performed -= m_Wrapper.m_GameControlActionsCallbackInterface.OnPunch;
+                @Punch.canceled -= m_Wrapper.m_GameControlActionsCallbackInterface.OnPunch;
             }
             m_Wrapper.m_GameControlActionsCallbackInterface = instance;
             if (instance != null)
@@ -277,6 +302,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                 @Drop.started += instance.OnDrop;
                 @Drop.performed += instance.OnDrop;
                 @Drop.canceled += instance.OnDrop;
+                @Punch.started += instance.OnPunch;
+                @Punch.performed += instance.OnPunch;
+                @Punch.canceled += instance.OnPunch;
             }
         }
     }
@@ -288,5 +316,6 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnPick(InputAction.CallbackContext context);
         void OnDrop(InputAction.CallbackContext context);
+        void OnPunch(InputAction.CallbackContext context);
     }
 }

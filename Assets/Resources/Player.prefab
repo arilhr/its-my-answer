@@ -166,11 +166,21 @@ MonoBehaviour:
   moveSpeed: 1
   maxSpeed: 5
   jumpForce: 5
+  punchedForce: 1000
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
   itemPickedPos: {fileID: 8774119761827155194}
   currentAnswerPickedText: {fileID: 4525283223468050363}
+  punchGizmos: 1
+  punchArea: {x: 1, y: 1, z: 1}
+  punchOffset: {x: 0, y: 1, z: 0}
+  punchMaxDistance: 1.34
+  punchLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  showPickAnswerArea: 0
+  showPunchArea: 0
 --- !u!114 &8210385024706392578
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -61,7 +61,7 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
         {
             AnswerItem answerPicked = answerer.currentItemPicked;
             answerer.DropItem();
-            PhotonNetwork.Destroy(answerPicked.gameObject);
+            answerPicked.SetItemActive(false);
         }
         else
         {
@@ -84,7 +84,7 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
         AnswerItem answerPicked = player.currentItemPicked;
 
         player.DropItem();
-        PhotonNetwork.Destroy(answerPicked.gameObject);
+        answerPicked.SetItemActive(false);
     }
 
     private void FalseAnswer(PlayerController answerer)
