@@ -23,6 +23,23 @@ public class MenuManager : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        
+    }
+
+    private void Update()
+    {
+        UpdateUsername();
+    }
+
+    private void UpdateUsername()
+    {
+        if (!PhotonNetwork.IsConnected) return;
+
+        profileNameText.text = PhotonNetwork.NickName;
+    }
+
+    private void ShowInputUsername()
+    {
         inputUsernamePanel.SetActive(true);
         menuPanel.SetActive(false);
     }
@@ -40,6 +57,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public void Play()
     {
+        if (!PhotonNetwork.IsConnectedAndReady) return;
+
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.CleanupCacheOnLeave = false;
         roomOptions.MaxPlayers = 2;
