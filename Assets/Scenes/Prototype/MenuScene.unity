@@ -997,6 +997,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   username: 
+  deactiveLoadUsername: 1
 --- !u!1 &911430512
 GameObject:
   m_ObjectHideFlags: 0

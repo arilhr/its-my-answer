@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [Header("Reference")]
     public Transform itemPickedPos;
     public TMP_Text currentAnswerPickedText;
+    private Animator animator;
 
     private float turnSmoothValue;
     private float turnSmoothTime = 0.1f;
@@ -33,6 +34,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [Header("Debug")]
     public bool showPickAnswerArea = false;
     public bool showPunchArea = false;
+    public GameObject playerModelTest;
 
     public int currentAnswer { private set; get; }
     public AnswerItem currentItemPicked { private set; get; }
@@ -89,12 +91,21 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             CameraManager.Instance.SetObjectFollow(transform);
             playerCamera = CameraManager.Instance.mainCamera.transform;
+
+            // spawn player model skin
+            GameObject playerModel = PhotonNetwork.Instantiate("Player Models/" + playerModelTest.name, transform.position, Quaternion.identity);
+            animator = playerModel.GetComponent<Animator>();
         }
     }
 
     private void Update()
     {
         UpdateAnswerUI();
+
+        if (pv.IsMine)
+        {
+            UpdateAnimation();
+        }
     }
 
     private void FixedUpdate()
@@ -253,7 +264,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     #endregion
 
-
+    #region UI
     private void UpdateAnswerUI()
     {
         if (currentAnswer == -1)
@@ -261,6 +272,25 @@ public class PlayerController : MonoBehaviourPunCallbacks
         else
             currentAnswerPickedText.text = $"{currentAnswer}";
     }
+    #endregion
+
+    #region Animation
+    private void UpdateAnimation() 
+    {
+        // run state
+        Vector2 moveInput = input.GameControl.Move.ReadValue<Vector2>();
+        Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
+        if (direction.magnitude > 0.1f)
+        {
+            animator.SetBool("isRunning", true);
+        }
+        else
+        {
+            animator.SetBool("isRunning", false);
+        }
+    }
+
+    #endregion
 
     #region Static Function
     public static PlayerController GetLocalPlayer()
@@ -275,6 +305,25 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 if (player.photonView.Owner == PhotonNetwork.LocalPlayer)
                 {
                     return player;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static GameObject GetPlayerObject(Player owner)
+    {
+        GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject p in playerObjects)
+        {
+            PlayerController player = p.GetComponent<PlayerController>();
+
+            if (player != null)
+            {
+                if (player.photonView.Owner == owner)
+                {
+                    return p;
                 }
             }
         }

@@ -10,6 +10,9 @@ public class AccountManager : Singleton<AccountManager>
 
     public string username;
 
+    [Header("Debug")]
+    public bool deactiveLoadUsername = false;
+
     private void Start()
     {
         LoadData();
@@ -19,7 +22,7 @@ public class AccountManager : Singleton<AccountManager>
     {
         // load username
         username = PlayerPrefs.GetString(UNAME_KEY);
-        if (username == string.Empty)
+        if (username == string.Empty || deactiveLoadUsername)
         {
             SetUsername($"Player {Random.Range(0, 1000)}");
         }
