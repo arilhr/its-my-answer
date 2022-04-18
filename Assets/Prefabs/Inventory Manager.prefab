@@ -45,8 +45,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skins:
   - skinData: {fileID: 11400000, guid: 60429099f7eb3c14c93c40c998e4dfed, type: 2}
-    owned: 0
-    used: 0
+    owned: 1
+    used: 1
   - skinData: {fileID: 11400000, guid: 221edaff2505f024b8e63e3bb9aeae7b, type: 2}
     owned: 0
     used: 0

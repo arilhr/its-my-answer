@@ -12,6 +12,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public GameObject inputUsernamePanel;
     public GameObject menuPanel;
     public GameObject roomPanel;
+    public GameObject selectionSkinPanel;
 
     [Header("Components")]
     public TMP_InputField inputUsernameField;
@@ -19,12 +20,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     [Scene]
     public string gameScene;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     private void Update()
     {
@@ -53,6 +48,19 @@ public class MenuManager : MonoBehaviourPunCallbacks
         menuPanel.SetActive(true);
 
         profileNameText.text = PhotonNetwork.NickName;
+    }
+
+    public void ShowSelectionSkin()
+    {
+        menuPanel.SetActive(false);
+        selectionSkinPanel.SetActive(true);
+    }
+
+    public void BackToMenu()
+    {
+        inputUsernamePanel.SetActive(false);
+        selectionSkinPanel.SetActive(false);
+        menuPanel.SetActive(true);
     }
 
     public void Play()

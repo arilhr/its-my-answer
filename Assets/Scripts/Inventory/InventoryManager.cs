@@ -22,6 +22,7 @@ public class InventoryManager : MonoBehaviour
     public Skin defaultSkin;
 
     public Action onChangedSkin;
+    public Action onSkinDataChanged;
 
     private void Awake()
     {
@@ -38,22 +39,7 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
-        InitializeInventory();
         LoadSkins();
-    }
-
-    private void InitializeInventory()
-    {
-        // set starting skin data
-        for (int i = 0; i < skins.Count; i++)
-        {
-            ChangeSkinInventoryData(i, false, false);
-        }
-
-        // change owned and used in default skin
-        int indexDefaultSkin = skins.FindIndex(x => x.skinData == defaultSkin);
-        ChangeSkinInventoryData(indexDefaultSkin, true, false);
-        ChangeUsedSkin(indexDefaultSkin);
     }
 
     private void LoadSkins()
@@ -65,6 +51,10 @@ public class InventoryManager : MonoBehaviour
         // if there is no saved data, then load starting data
         if (loadedSkins.Count == 0)
         {
+            // used in default skin
+            int indexDefaultSkin = skins.FindIndex(x => x.skinData == defaultSkin);
+            ChangeUsedSkin(indexDefaultSkin);
+            
             Debug.Log($"No saved file.");
             return;
         }
@@ -74,7 +64,12 @@ public class InventoryManager : MonoBehaviour
             if (skins.Exists(x => x.skinData == loadedSkin.skinData))
             {
                 int indexToChange = skins.FindIndex(x => x.skinData == loadedSkin.skinData);
-                ChangeSkinInventoryData(indexToChange, loadedSkin.owned, loadedSkin.used);
+                ChangeSkinInventoryData(indexToChange, loadedSkin.owned, false);
+
+                if (loadedSkin.used)
+                {
+                    ChangeUsedSkin(indexToChange);
+                }
             }
         }
     }
@@ -98,13 +93,12 @@ public class InventoryManager : MonoBehaviour
         ChangeSkinInventoryData(indexCurrentUsed, skins[indexCurrentUsed].owned, true);
 
         onChangedSkin?.Invoke();
-
+        
         Debug.Log($"Skin changed to {skinToUsed.skinName}");
     }
 
     public void ChangeUsedSkin(int indexSkin)
     {
-
         // unused previous skin
         if (skins.Exists(x => x.used))
         {
@@ -126,7 +120,7 @@ public class InventoryManager : MonoBehaviour
         Debug.Log($"Skin changed to {skins[indexSkin].skinData.skinName}");
     }
 
-    private void ChangeSkinInventoryData(int indexSkin, bool owned, bool used)
+    public void ChangeSkinInventoryData(int indexSkin, bool owned, bool used)
     {
         SkinInventoryData updatedData = skins[indexSkin];
 
@@ -134,7 +128,22 @@ public class InventoryManager : MonoBehaviour
         updatedData.used = used;
 
         skins[indexSkin] = updatedData;
+
+        SaveSkinData();
+
+        onSkinDataChanged?.Invoke();
     }
 
+    public void SaveSkinData()
+    {
+        List<SkinInventoryData> skinDataToSave = new List<SkinInventoryData>();
+
+        foreach (SkinInventoryData skin in skins)
+        {
+            skinDataToSave.Add(skin);
+        }
+
+        SaveSystem.SaveToJson(SKIN_FILE_NAME, skinDataToSave);
+    }
 }
 

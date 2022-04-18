@@ -13,12 +13,16 @@ public class SkinItemUI : MonoBehaviour
 
     private void Start()
     {
+        if (InventoryManager.Instance != null) InventoryManager.Instance.onSkinDataChanged += UpdateUI;
+
+        UpdateUI();
+
         selectButton.onClick.AddListener(() => SelectSkin());
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        UpdateUI();
+        InventoryManager.Instance.onSkinDataChanged -= UpdateUI;
     }
 
     private void UpdateUI()
@@ -46,7 +50,18 @@ public class SkinItemUI : MonoBehaviour
         }
         else
         {
-            Debug.Log($"You not owned this skin!, Buy it first!");
+            BuySkin();
         }
+    }
+
+    private void BuySkin()
+    {
+        if (InventoryManager.Instance == null) return;
+
+        // TODO: check player has enough money
+
+        InventoryManager.Instance.ChangeSkinInventoryData(indexSkin, true, false);
+
+        Debug.Log($"Skin {skinName.text} bought");
     }
 }

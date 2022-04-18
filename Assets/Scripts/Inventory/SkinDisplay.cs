@@ -6,10 +6,12 @@ public class SkinDisplay : MonoBehaviour
 {
     public Transform skinDisplayParent;
     public GameObject currentShowedSkin;
-
+    
     private void Start()
     {
         if (InventoryManager.Instance != null) InventoryManager.Instance.onChangedSkin += UpdateDisplay;
+
+        UpdateDisplay();
     }
 
     private void OnDisable()
