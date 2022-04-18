@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             playerCamera = CameraManager.Instance.mainCamera.transform;
 
             // spawn player model skin
-            GameObject playerModel = PhotonNetwork.Instantiate("Player Models/" + playerModelTest.name, transform.position, Quaternion.identity);
+            GameObject playerModel = PhotonNetwork.Instantiate("Player Models/" + InventoryManager.Instance.GetUsedSkin().modelInGame.name, transform.position, Quaternion.identity);
             animator = playerModel.GetComponent<Animator>();
         }
     }
@@ -101,11 +101,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void Update()
     {
         UpdateAnswerUI();
-
-        if (pv.IsMine)
-        {
-            UpdateAnimation();
-        }
+        UpdateAnimation();
     }
 
     private void FixedUpdate()
@@ -277,6 +273,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     #region Animation
     private void UpdateAnimation() 
     {
+        if (!pv.IsMine) return;
+        if (pv.CreatorActorNr != pv.OwnerActorNr) return;
+
         // run state
         Vector2 moveInput = input.GameControl.Move.ReadValue<Vector2>();
         Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
