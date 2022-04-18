@@ -65,7 +65,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             input.GameControl.Jump.started += Jump;
             input.GameControl.Pick.started += PickItemInput;
-            input.GameControl.Drop.started += DropItemInput;
             input.GameControl.Punch.started += PunchInput;
             input.GameControl.Enable();
         }
@@ -79,7 +78,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             input.GameControl.Jump.started -= Jump;
             input.GameControl.Pick.started -= PickItemInput;
-            input.GameControl.Drop.started -= DropItemInput;
             input.GameControl.Punch.started -= PunchInput;
             input.GameControl.Disable();
         }
@@ -205,28 +203,31 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     public void PickItem()
     {
-        RaycastHit hit;
-        if (Physics.BoxCast(transform.position, Vector3.one * pickRayLength / 2f, transform.forward, out hit, Quaternion.identity, pickRayLength))
+        if (currentItemPicked == null)
         {
-            if (hit.collider.GetComponent<AnswerItem>() == null) return;
-            if (hit.collider.GetComponent<AnswerItem>().isPicked) return;
+            RaycastHit hit;
+            if (Physics.BoxCast(transform.position, Vector3.one * pickRayLength / 2f, transform.forward, out hit, Quaternion.identity, pickRayLength))
+            {
+                if (hit.collider.GetComponent<AnswerItem>() == null) return;
+                if (hit.collider.GetComponent<AnswerItem>().isPicked) return;
 
-            Debug.Log($"Pick item: {hit.collider.gameObject.name}");
+                Debug.Log($"Pick item: {hit.collider.gameObject.name}");
 
-            currentItemPicked = hit.collider.GetComponent<AnswerItem>();
-            currentItemPicked.Picked(this);
+                currentItemPicked = hit.collider.GetComponent<AnswerItem>();
+                currentItemPicked.Picked(this);
 
-            int updatedAnswer = hit.collider.GetComponent<AnswerItem>().answer;
+                int updatedAnswer = hit.collider.GetComponent<AnswerItem>().answer;
 
-            Hashtable currentProps = new Hashtable();
-            currentProps["CurrentAnswer"] = updatedAnswer;
-            PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
+                Hashtable currentProps = new Hashtable();
+                currentProps["CurrentAnswer"] = updatedAnswer;
+                PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
+            }
         }
-    }
-
-    private void DropItemInput(InputAction.CallbackContext ctx)
-    {
-        DropItem();
+        else
+        {
+            DropItem();
+        }
+        
     }
 
     public void DropItem()
@@ -234,6 +235,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (currentItemPicked == null) return;
 
         currentItemPicked.Dropped();
+        currentItemPicked = null;
 
         Hashtable currentProps = new Hashtable();
         currentProps["CurrentAnswer"] = -1;
