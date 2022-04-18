@@ -83,7 +83,7 @@ MonoBehaviour:
   moveSpeed: 1
   maxSpeed: 5
   jumpForce: 5
-  punchedForce: 1000
+  punchedForce: 50
   groundLayer:
     serializedVersion: 2
     m_Bits: 256

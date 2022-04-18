@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public float jumpForce = 5f;
     public float punchedForce = 20f;
     public LayerMask groundLayer;
+    private bool isStunned = false;
 
     [Header("Reference")]
     public Transform itemPickedPos;
@@ -111,6 +112,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void Move()
     {
+        if (isStunned) return;
+
         Vector2 moveInput = input.GameControl.Move.ReadValue<Vector2>();
         Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
 
@@ -125,13 +128,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
             rb.AddForce(moveDir * moveSpeed, ForceMode.Impulse);
         }
 
+        CheckMaxSpeed();
+
         if (rb.velocity.y < 0f)
             rb.velocity -= Vector3.down * Physics.gravity.y * Time.fixedDeltaTime;
-
-        Vector3 horizontalVelocity = rb.velocity;
-        horizontalVelocity.y = 0;
-        if (horizontalVelocity.sqrMagnitude > maxSpeed * maxSpeed)
-            rb.velocity = horizontalVelocity.normalized * maxSpeed + Vector3.up * rb.velocity.y;
     }
 
     private void CheckMaxSpeed()
@@ -144,6 +144,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void Jump(InputAction.CallbackContext ctx)
     {
+        if (isStunned) return;
+
         if (IsGrounded())
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -152,19 +154,13 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void PunchInput(InputAction.CallbackContext ctx)
     {
+        if (isStunned) return;
+
         Punch();
     }
 
     private void Punch()
     {
-        pv.RPC("RpcPunch", RpcTarget.Others);
-    }
-
-    [PunRPC]
-    private void RpcPunch()
-    {
-        Debug.Log($"{pv.Owner.NickName} Punching");
-
         Vector3 centerPos = transform.position + transform.right * punchOffset.x + transform.up * punchOffset.y + transform.forward * punchOffset.z;
         RaycastHit hit;
         if (Physics.BoxCast(centerPos, punchArea / 2, transform.forward, out hit, Quaternion.identity, punchMaxDistance, punchLayerMask))
@@ -175,9 +171,15 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
             if (player == null) return;
 
-            player.Punched(transform.forward * punchedForce);
+            player.photonView.RPC("RpcPunch", player.photonView.Owner, transform.forward);
         }
+        
+    }
 
+    [PunRPC]
+    private void RpcPunch(Vector3 forceDir)
+    {
+        Punched(forceDir * punchedForce);
     }
 
     public void Punched(Vector3 force)
@@ -186,7 +188,18 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
         DropItem();
 
-        rb.AddForce(force);
+        rb.AddForce(force * 10);
+
+        StartCoroutine(GetStun());
+    }
+
+    private IEnumerator GetStun()
+    {
+        isStunned = true;
+        
+        yield return new WaitForSeconds(1f);
+
+        isStunned = false;
     }
 
     private bool IsGrounded()
@@ -198,41 +211,42 @@ public class PlayerController : MonoBehaviourPunCallbacks
     #region Pick and Drop Item
     private void PickItemInput(InputAction.CallbackContext ctx)
     {
-        PickItem();
-    }
-
-    public void PickItem()
-    {
         if (currentItemPicked == null)
         {
-            RaycastHit hit;
-            if (Physics.BoxCast(transform.position, Vector3.one * pickRayLength / 2f, transform.forward, out hit, Quaternion.identity, pickRayLength))
-            {
-                if (hit.collider.GetComponent<AnswerItem>() == null) return;
-                if (hit.collider.GetComponent<AnswerItem>().isPicked) return;
-
-                Debug.Log($"Pick item: {hit.collider.gameObject.name}");
-
-                currentItemPicked = hit.collider.GetComponent<AnswerItem>();
-                currentItemPicked.Picked(this);
-
-                int updatedAnswer = hit.collider.GetComponent<AnswerItem>().answer;
-
-                Hashtable currentProps = new Hashtable();
-                currentProps["CurrentAnswer"] = updatedAnswer;
-                PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
-            }
+            PickItem();
         }
         else
         {
             DropItem();
         }
-        
+    }
+
+    public void PickItem()
+    {
+        RaycastHit hit;
+        if (Physics.BoxCast(transform.position, Vector3.one * pickRayLength / 2f, transform.forward, out hit, Quaternion.identity, pickRayLength))
+        {
+            if (hit.collider.GetComponent<AnswerItem>() == null) return;
+            if (hit.collider.GetComponent<AnswerItem>().isPicked) return;
+
+            Debug.Log($"Pick item: {hit.collider.gameObject.name}");
+
+            currentItemPicked = hit.collider.GetComponent<AnswerItem>();
+            currentItemPicked.Picked(this);
+
+            int updatedAnswer = hit.collider.GetComponent<AnswerItem>().answer;
+
+            Hashtable currentProps = new Hashtable();
+            currentProps["CurrentAnswer"] = updatedAnswer;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
+        }
     }
 
     public void DropItem()
     {
         if (currentItemPicked == null) return;
+
+        Debug.Log($"Dropped item!");
 
         currentItemPicked.Dropped();
         currentItemPicked = null;

@@ -98,6 +98,15 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        base.OnPlayerLeftRoom(otherPlayer);
+
+        Debug.Log($"{otherPlayer.NickName} left the room");
+        
+        GameEnd(PhotonNetwork.LocalPlayer);
+    }
+
     public override void OnLeftRoom()
     {
         base.OnLeftRoom();
@@ -179,6 +188,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void GameEnd(Player winner)
     {
+        Debug.Log($"Game End. {winner.NickName} win the game!");
+
         isGameEnd = true;
         GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
 
@@ -190,7 +201,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 player.input.Disable();
 
-                if (player.photonView.Owner == winner)
+                if (player.photonView.Owner == winner && player.photonView.CreatorActorNr == winner.ActorNumber)
                 {
                     CameraManager.Instance.SetObjectFollow(player.transform);
                 }

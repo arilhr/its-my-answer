@@ -31,11 +31,11 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
         questionText.text = question;
     }
 
-    public void CheckAnswer(PlayerController answerer, int playerAnswer)
+    public void CheckAnswer(PlayerController answerer)
     {
-        Debug.Log($"Check Answer");
+        Debug.Log($"Check Answer from {answerer.photonView.Owner.NickName}");
 
-        if (answer == playerAnswer)
+        if (answer == answerer.currentAnswer)
         {
             CorrectAnswer(answerer);
         }
@@ -47,39 +47,17 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
 
     private void CorrectAnswer(PlayerController answerer)
     {
-        Debug.Log($"Local Correct");
+        Debug.Log($"{answerer.photonView.Owner.NickName} is correct");
 
-        if (pv.IsMine)
-        {
-            SetQuestion(QuestionGenerator.Instance.GetNextQuestion());
-            answerer.photonView.Owner.AddScore(1);
+        SetQuestion(QuestionGenerator.Instance.GetNextQuestion());
+        answerer.photonView.Owner.AddScore(1);
 
-            pv.RPC("RpcCorrectAnswer", RpcTarget.All);
-        }
-
-        if (answerer.photonView.Owner == pv.Owner)
-        {
-            AnswerItem answerPicked = answerer.currentItemPicked;
-            answerer.DropItem();
-            answerPicked.SetItemActive(false);
-        }
-        else
-        {
-            pv.RPC("RpcPlayerCorrectAnswer", RpcTarget.Others);
-        }
-    }
-
-    [PunRPC]
-    private void RpcCorrectAnswer()
-    {
-        Debug.Log($"Correct");
+        pv.RPC("RpcPlayerCorrectAnswer", answerer.photonView.Owner);
     }
 
     [PunRPC]
     private void RpcPlayerCorrectAnswer()
     {
-        Debug.Log($"Player Correct");
-
         PlayerController player = PlayerController.GetLocalPlayer();
         AnswerItem answerPicked = player.currentItemPicked;
 
@@ -89,35 +67,15 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
 
     private void FalseAnswer(PlayerController answerer)
     {
-        Debug.Log($"Local False");
+        Debug.Log($"{answerer.photonView.Owner.NickName} is wrong");
 
-        if (pv.IsMine)
-        {
-            pv.RPC("RpcFalseAnswer", RpcTarget.All);
-        }
-
-        if (answerer.photonView.Owner == pv.Owner)
-        {
-            AnswerItem answerItem = answerer.currentItemPicked;
-            answerer.DropItem();
-            answerItem?.RandomizePosition();
-        }
-        else
-        {
-            pv.RPC("RpcPlayerFalseAnswer", RpcTarget.Others);
-        }
-    }
-
-    [PunRPC]
-    private void RpcFalseAnswer()
-    {
-        Debug.Log($"False");
+        pv.RPC("RpcPlayerFalseAnswer", answerer.photonView.Owner);
     }
 
     [PunRPC]
     private void RpcPlayerFalseAnswer()
     {
-        Debug.Log($"Player False Answer");
+        Debug.Log($"You wrong!");
 
         PlayerController player = PlayerController.GetLocalPlayer();
         AnswerItem answerItem = player.currentItemPicked;

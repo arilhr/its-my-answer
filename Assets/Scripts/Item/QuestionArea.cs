@@ -13,13 +13,10 @@ public class QuestionArea : MonoBehaviour
         {
             PlayerController player = other.GetComponent<PlayerController>();
 
-            Debug.Log($"Collide with player {player.currentAnswer}");
-
-            if (question.pv.IsMine)
+            if (question.pv.IsMine && player.currentAnswer != -1)
             {
-                question.CheckAnswer(player, player.currentAnswer);
+                question.CheckAnswer(player);
             }
-
         }
     }
 }
