@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1768400528135406059}
   - component: {fileID: 9082768563350867658}
   - component: {fileID: 1969836934075409904}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Answer Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -181,7 +181,7 @@ GameObject:
   - component: {fileID: 5444849522367103720}
   - component: {fileID: 5444849522367103723}
   - component: {fileID: 5444849522367103722}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -280,7 +280,7 @@ GameObject:
   - component: {fileID: 5444849522698956063}
   - component: {fileID: 5444849522698956062}
   - component: {fileID: 5444849522698956065}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

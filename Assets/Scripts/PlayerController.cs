@@ -16,14 +16,29 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public float punchedForce = 20f;
     public LayerMask groundLayer;
     private bool isStunned = false;
+    private bool isMoved = true;
+
+    private float turnSmoothValue;
+    private float turnSmoothTime = 0.1f;
 
     [Header("Reference")]
     public Transform itemPickedPos;
     public TMP_Text currentAnswerPickedText;
     private Animator animator;
+    private Rigidbody rb;
+    private PhotonView pv;
+    private Transform playerCamera;
+    public PlayerInput input { private set; get; }
 
-    private float turnSmoothValue;
-    private float turnSmoothTime = 0.1f;
+    [Header("Item Pick Properties")]
+    public bool itemPickGizmos = true;
+    public Vector3 itemPickArea;
+    public Vector3 itemPickOffset;
+    public float itemPickMaxDistance;
+    public LayerMask itemPickLayer;
+
+    public int currentAnswer { private set; get; }
+    public AnswerItem currentItemPicked { private set; get; }
 
     [Header("Punch Cast")]
     public bool punchGizmos = true;
@@ -31,20 +46,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public Vector3 punchOffset;
     public float punchMaxDistance;
     public LayerMask punchLayerMask;
+    private float timeBetweenPunch = 1f;
+    private bool isPunching = false;
 
     [Header("Debug")]
     public bool showPickAnswerArea = false;
     public bool showPunchArea = false;
     public GameObject playerModelTest;
 
-    public int currentAnswer { private set; get; }
-    public AnswerItem currentItemPicked { private set; get; }
-    private float pickRayLength = 2f;
 
-    private Transform playerCamera;
-    public PlayerInput input { private set; get; }
-    private Rigidbody rb;
-    private PhotonView pv;
+    
 
     private void Awake()
     {
@@ -161,19 +172,33 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void Punch()
     {
+        if (isPunching) return;
+
+        // animation
+        animator.SetTrigger("Punch");
+
         Vector3 centerPos = transform.position + transform.right * punchOffset.x + transform.up * punchOffset.y + transform.forward * punchOffset.z;
         RaycastHit hit;
-        if (Physics.BoxCast(centerPos, punchArea / 2, transform.forward, out hit, Quaternion.identity, punchMaxDistance, punchLayerMask))
+        if (Physics.BoxCast(centerPos, punchArea / 2, transform.forward, out hit, transform.rotation, punchMaxDistance, punchLayerMask))
         {
             Debug.Log($"Collided {hit.collider.gameObject.name}");
 
             PlayerController player = hit.collider.gameObject.GetComponent<PlayerController>();
 
+            if (player == this) return;
             if (player == null) return;
 
             player.photonView.RPC("RpcPunch", player.photonView.Owner, transform.forward);
         }
-        
+
+        StartCoroutine(PunchCooldown());
+    }
+
+    private IEnumerator PunchCooldown()
+    {
+        isPunching = true;
+        yield return new WaitForSeconds(timeBetweenPunch);
+        isPunching = false;
     }
 
     [PunRPC]
@@ -224,7 +249,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public void PickItem()
     {
         RaycastHit hit;
-        if (Physics.BoxCast(transform.position, Vector3.one * pickRayLength / 2f, transform.forward, out hit, Quaternion.identity, pickRayLength))
+        Vector3 centerPos = transform.position + transform.right * itemPickOffset.x + transform.up * itemPickOffset.y + transform.forward * itemPickOffset.z;
+        if (Physics.BoxCast(centerPos, itemPickArea / 2, transform.forward, out hit, transform.rotation, itemPickMaxDistance, itemPickLayer))
         {
             if (hit.collider.GetComponent<AnswerItem>() == null) return;
             if (hit.collider.GetComponent<AnswerItem>().isPicked) return;
@@ -349,11 +375,44 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void OnDrawGizmos()
     {
-        if (punchGizmos)
+        if (showPunchArea)
         {
             Gizmos.color = Color.yellow;
             Vector3 centerPos = transform.position + transform.right * punchOffset.x + transform.up * punchOffset.y + transform.forward * punchOffset.z;
-            Gizmos.DrawCube(centerPos + transform.forward * punchMaxDistance, punchArea);
+            Gizmos.DrawWireCube(centerPos + transform.forward * punchMaxDistance, punchArea);
+        }
+
+        if (punchGizmos)
+        {
+            RaycastHit hit;
+            Vector3 centerPos = transform.position + transform.right * punchOffset.x + transform.up * punchOffset.y + transform.forward * punchOffset.z;
+            bool isHit = Physics.BoxCast(centerPos, punchArea / 2, transform.forward, out hit, transform.rotation, punchMaxDistance, punchLayerMask);
+            
+            if (isHit)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawRay(centerPos, transform.forward * hit.distance);
+            }
+        }
+
+        if (showPickAnswerArea)
+        {
+            Gizmos.color = Color.red;
+            Vector3 centerPos = transform.position + transform.right * itemPickOffset.x + transform.up * itemPickOffset.y + transform.forward * itemPickOffset.z;
+            Gizmos.DrawWireCube(centerPos + transform.forward * itemPickMaxDistance, itemPickArea);
+        }
+
+        if (itemPickGizmos)
+        {
+            RaycastHit hit;
+            Vector3 centerPos = transform.position + transform.right * itemPickOffset.x + transform.up * itemPickOffset.y + transform.forward * itemPickOffset.z;
+            bool isHit = (Physics.BoxCast(centerPos, itemPickArea / 2, transform.forward, out hit, transform.rotation, itemPickMaxDistance, itemPickLayer));
+
+            if (isHit)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(centerPos, transform.forward * hit.distance);
+            }
         }
     }
 }
