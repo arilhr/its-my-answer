@@ -11,6 +11,14 @@ public struct SkinInventoryData
     public bool used;
 }
 
+[Serializable]
+public struct SkinDataToSave
+{
+    public string skinName;
+    public bool owned;
+    public bool used;
+}
+
 public class InventoryManager : MonoBehaviour
 {
     public const string SKIN_FILE_NAME = "skins";
@@ -45,7 +53,7 @@ public class InventoryManager : MonoBehaviour
     private void LoadSkins()
     {
         // load data
-        List<SkinInventoryData> loadedSkins = new List<SkinInventoryData>();
+        List<SkinDataToSave> loadedSkins = new List<SkinDataToSave>();
         SaveSystem.ReadJsonFile(SKIN_FILE_NAME, out loadedSkins);
 
         // if there is no saved data, then load starting data
@@ -59,11 +67,11 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
-        foreach (SkinInventoryData loadedSkin in loadedSkins)
+        foreach (SkinDataToSave loadedSkin in loadedSkins)
         {
-            if (skins.Exists(x => x.skinData == loadedSkin.skinData))
+            if (skins.Exists(x => x.skinData.skinName == loadedSkin.skinName))
             {
-                int indexToChange = skins.FindIndex(x => x.skinData == loadedSkin.skinData);
+                int indexToChange = skins.FindIndex(x => x.skinData.skinName == loadedSkin.skinName);
                 ChangeSkinInventoryData(indexToChange, loadedSkin.owned, false);
 
                 if (loadedSkin.used)
@@ -136,11 +144,11 @@ public class InventoryManager : MonoBehaviour
 
     public void SaveSkinData()
     {
-        List<SkinInventoryData> skinDataToSave = new List<SkinInventoryData>();
+        List<SkinDataToSave> skinDataToSave = new List<SkinDataToSave>();
 
         foreach (SkinInventoryData skin in skins)
         {
-            skinDataToSave.Add(skin);
+            skinDataToSave.Add(new SkinDataToSave { skinName = skin.skinData.skinName, owned = skin.owned, used = skin.used });
         }
 
         SaveSystem.SaveToJson(SKIN_FILE_NAME, skinDataToSave);

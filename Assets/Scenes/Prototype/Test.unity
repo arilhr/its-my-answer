@@ -646,6 +646,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Inventory Manager
       objectReference: {fileID: 0}
+    - target: {fileID: 6466967253952367313, guid: 8f2e310e69cf9c04a8997daae9540d95, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6466967253952367319, guid: 8f2e310e69cf9c04a8997daae9540d95, type: 3}
       propertyPath: m_RootOrder
       value: 2

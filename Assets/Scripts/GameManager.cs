@@ -104,7 +104,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         Debug.Log($"{otherPlayer.NickName} left the room");
         
-        GameEnd(PhotonNetwork.LocalPlayer);
+        if (!isGameEnd)
+            GameEnd(PhotonNetwork.LocalPlayer);
     }
 
     public override void OnLeftRoom()
@@ -203,6 +204,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
                 if (player.photonView.Owner == winner && player.photonView.CreatorActorNr == winner.ActorNumber)
                 {
+                    player.WinAnimate();
                     CameraManager.Instance.SetObjectFollow(player.transform);
                 }
             }

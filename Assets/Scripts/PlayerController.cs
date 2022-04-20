@@ -22,7 +22,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private float turnSmoothTime = 0.1f;
 
     [Header("Reference")]
-    public Transform itemPickedPos;
+    public PlayerAnswer playerAnswer;
+    public Transform droppedItemPos;
     public TMP_Text currentAnswerPickedText;
     private Animator animator;
     private Rigidbody rb;
@@ -260,12 +261,24 @@ public class PlayerController : MonoBehaviourPunCallbacks
             currentItemPicked = hit.collider.GetComponent<AnswerItem>();
             currentItemPicked.Picked(this);
 
-            int updatedAnswer = hit.collider.GetComponent<AnswerItem>().answer;
+            int pickedAnswer = hit.collider.GetComponent<AnswerItem>().answer;
+
+            // set player answer object
+            pv.RPC("RpcPickAnswer", RpcTarget.All, pickedAnswer);
 
             Hashtable currentProps = new Hashtable();
-            currentProps["CurrentAnswer"] = updatedAnswer;
+            currentProps["CurrentAnswer"] = pickedAnswer;
             PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
+
+            // animation
+            animator.SetBool("isPickBox", true);
         }
+    }
+
+    [PunRPC]
+    public void RpcPickAnswer(int answer)
+    {
+        playerAnswer.SetAnswerPicked(answer);
     }
 
     public void DropItem()
@@ -277,10 +290,23 @@ public class PlayerController : MonoBehaviourPunCallbacks
         currentItemPicked.Dropped();
         currentItemPicked = null;
 
+        // set player answer dropped
+        pv.RPC("RpcDropAnswer", RpcTarget.All);
+
         Hashtable currentProps = new Hashtable();
         currentProps["CurrentAnswer"] = -1;
         PhotonNetwork.LocalPlayer.SetCustomProperties(currentProps);
+
+        // animation
+        animator.SetBool("isPickBox", false);
     }
+
+    [PunRPC]
+    public void RpcDropAnswer()
+    {
+        playerAnswer.SetAnswerDropped();
+    }
+
     #endregion
 
     #region Callback
@@ -331,7 +357,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
         }
     }
 
+    public void WinAnimate()
+    {
+        if (!pv.IsMine) return;
+
+        animator.SetBool("isWin", true);
+    }
     #endregion
+
 
     #region Static Function
     public static PlayerController GetLocalPlayer()

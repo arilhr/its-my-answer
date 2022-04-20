@@ -11,7 +11,7 @@ public class AnswerItem : MonoBehaviour, IPickable
     public PhotonView pv;
 
     private PlayerController currentCarrier;
-    private Transform currentPos;
+    private Transform droppedPos;
     private Rigidbody rb;
 
     public int answer { private set; get; }
@@ -26,11 +26,6 @@ public class AnswerItem : MonoBehaviour, IPickable
     private void Update()
     {
         if (!pv.IsMine) return;
-
-        if (currentPos != null)
-        {
-            transform.position = currentPos.position;
-        }
     }
 
     public void SetItemAnswer(int answer)
@@ -51,9 +46,10 @@ public class AnswerItem : MonoBehaviour, IPickable
     public void Picked(PlayerController player)
     {
         pv.TransferOwnership(PhotonNetwork.LocalPlayer);
-
+        
         currentCarrier = player;
-        currentPos = player.itemPickedPos;
+        droppedPos = player.droppedItemPos;
+        
 
         pv.RPC("OnPicked", RpcTarget.All, true);
     }
@@ -61,7 +57,9 @@ public class AnswerItem : MonoBehaviour, IPickable
     
     public void Dropped()
     {
-        currentPos = null;
+        transform.position = droppedPos.position;
+
+        droppedPos = null;
         currentCarrier = null;
 
         pv.RPC("OnPicked", RpcTarget.All, false);
@@ -72,6 +70,7 @@ public class AnswerItem : MonoBehaviour, IPickable
     {
         rb.isKinematic = cond;
         isPicked = cond;
+        gameObject.SetActive(!cond);
     }
 
     public void SetItemActive(bool cond)
