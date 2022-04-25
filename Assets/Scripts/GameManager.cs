@@ -104,8 +104,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         Debug.Log($"{otherPlayer.NickName} left the room");
         
-        if (!isGameEnd)
-            GameEnd(PhotonNetwork.LocalPlayer);
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+        {
+            if (!isGameEnd)
+                GameEnd(PhotonNetwork.PlayerList[0]);
+        }
     }
 
     public override void OnLeftRoom()
