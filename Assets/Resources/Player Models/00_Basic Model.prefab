@@ -992,7 +992,7 @@ GameObject:
   - component: {fileID: 8934595878965884959}
   - component: {fileID: 1263694931068812235}
   m_Layer: 0
-  m_Name: 01_Basic Model
+  m_Name: 00_Basic Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
