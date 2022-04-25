@@ -18,6 +18,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public TMP_InputField inputUsernameField;
     public TMP_Text profileNameText;
     public Button cancelButton;
+    public GameObject playerDisplay;
 
     [Header("Properties")]
     public byte playerToPlay;
@@ -64,9 +65,13 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public void BackToMenu()
     {
+        // disable all panels except menu panel
         inputUsernamePanel.SetActive(false);
         selectionSkinPanel.SetActive(false);
+        roomPanel.SetActive(false);
+        
         menuPanel.SetActive(true);
+        playerDisplay.SetActive(true);
     }
 
     public void Play()
@@ -86,9 +91,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         roomPanel.SetActive(true);
         menuPanel.SetActive(false);
+        playerDisplay.SetActive(false);
         cancelButton.interactable = true;
 
-        if (PhotonNetwork.IsMasterClient) matchmakingCoroutine = StartCoroutine(WaitForOpponent());
+        matchmakingCoroutine = StartCoroutine(WaitForOpponent());
     }
 
     public override void OnLeftRoom()
@@ -106,8 +112,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(3f);
 
-        PhotonNetwork.CurrentRoom.IsOpen = false;
-        PhotonNetwork.LoadLevel(gameScene);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.LoadLevel(gameScene);
+        } 
     }
 
     public void CancelMatchmaking()
@@ -115,9 +124,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
         if (!PhotonNetwork.InRoom) return;
 
         StopCoroutine(matchmakingCoroutine);
-        
-        menuPanel.SetActive(true);
-        roomPanel.SetActive(false);
+
+        BackToMenu();
 
         PhotonNetwork.LeaveRoom();
     }
