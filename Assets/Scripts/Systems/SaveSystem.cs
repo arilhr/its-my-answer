@@ -7,7 +7,7 @@ using UnityEngine;
 
 public static class SaveSystem
 {
-    public static string testDir = "D:";
+    public static string testDir = Application.persistentDataPath + "/saved/";
 
     /// <summary>
     /// Save JSON File from class data type

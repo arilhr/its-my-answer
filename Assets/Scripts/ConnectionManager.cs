@@ -37,6 +37,7 @@ public class ConnectionManager : SingletonPunCallback<ConnectionManager>
     }
 }
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(ConnectionManager))]
 public class ConnectionManagerEditor : Editor
 {
@@ -50,3 +51,4 @@ public class ConnectionManagerEditor : Editor
         }
     }
 }
+#endif

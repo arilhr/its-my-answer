@@ -5,7 +5,8 @@ public class SceneAttribute : PropertyAttribute
 {
 }
 
- 
+#if UNITY_EDITOR
+
 [CustomPropertyDrawer(typeof(SceneAttribute))]
 public class SceneDrawer : PropertyDrawer
 {
@@ -56,3 +57,4 @@ public class SceneDrawer : PropertyDrawer
     }
 }
 
+#endif

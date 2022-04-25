@@ -39,7 +39,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         profileNameText.text = PhotonNetwork.NickName;
     }
 
-    private void ShowInputUsername()
+    public void ShowInputUsername()
     {
         inputUsernamePanel.SetActive(true);
         menuPanel.SetActive(false);

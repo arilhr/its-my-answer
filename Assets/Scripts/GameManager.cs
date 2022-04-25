@@ -220,6 +220,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 }
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(GameManager))]
 public class GameManagerEditor : Editor
 {
@@ -233,3 +234,4 @@ public class GameManagerEditor : Editor
         }
     }
 }
+#endif

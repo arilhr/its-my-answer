@@ -58,6 +58,7 @@ public class TestConnectionManager : SingletonPunCallback<ConnectionManager>
     }
 }
 
+#if UNITY_EDITOR
 // Custom UI Inspector
 [CustomEditor(typeof(TestConnectionManager))]
 public class TEstConnectionManagerInspector : Editor
@@ -84,3 +85,4 @@ public class TEstConnectionManagerInspector : Editor
         }
     }
 }
+#endif

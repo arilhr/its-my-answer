@@ -51,6 +51,7 @@ public class TestPlayerAnimator : MonoBehaviourPunCallbacks
     }
 }
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(TestPlayerAnimator))]
 public class TestPlayerAnimatorEditor : Editor
 {
@@ -71,3 +72,4 @@ public class TestPlayerAnimatorEditor : Editor
         }
     }
 }
+#endif
