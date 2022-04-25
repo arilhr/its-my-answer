@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public PlayerAnswer playerAnswer;
     public Transform droppedItemPos;
     public TMP_Text currentAnswerPickedText;
+    public TMP_Text playerName;
+    public ParticleSystem runParticle;
     private Animator animator;
     private Rigidbody rb;
     private PhotonView pv;
@@ -107,12 +109,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
             GameObject playerModel = PhotonNetwork.Instantiate("Player Models/" + InventoryManager.Instance.GetUsedSkin().modelInGame.name, transform.position, Quaternion.identity);
             animator = playerModel.GetComponent<Animator>();
         }
+
+        // set name player ui
+        playerName.text = pv.Owner.NickName;
     }
 
     private void Update()
     {
         UpdateAnswerUI();
         UpdateAnimation();
+        UpdateRunParticle();
     }
 
     private void FixedUpdate()
@@ -362,6 +368,24 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (!pv.IsMine) return;
 
         animator.SetBool("isWin", true);
+    }
+
+    private void UpdateRunParticle()
+    {
+        if (IsGrounded())
+        {
+            if (!runParticle.isPlaying)
+            {
+                runParticle.Play();
+            }
+        }
+        else
+        {
+            if (runParticle.isPlaying)
+            {
+                runParticle.Stop();
+            }
+        }
     }
     #endregion
 
