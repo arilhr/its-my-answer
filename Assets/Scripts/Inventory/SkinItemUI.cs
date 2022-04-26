@@ -8,16 +8,20 @@ public class SkinItemUI : MonoBehaviour
 {
     public int indexSkin;
     public TMP_Text skinName;
+    public Image skinImage;
     public TMP_Text skinPrice;
     public Button selectButton;
 
     private void Start()
     {
-        if (InventoryManager.Instance != null) InventoryManager.Instance.onSkinDataChanged += UpdateUI;
-
         UpdateUI();
 
         selectButton.onClick.AddListener(() => SelectSkin());
+    }
+
+    private void OnEnable()
+    {
+        if (InventoryManager.Instance != null) InventoryManager.Instance.onSkinDataChanged += UpdateUI;
     }
 
     private void OnDisable()
@@ -32,10 +36,20 @@ public class SkinItemUI : MonoBehaviour
         SkinInventoryData data = InventoryManager.Instance.skins[indexSkin];
 
         skinName.text = data.skinData.skinName;
-        skinPrice.text = data.skinData.price.ToString();
+        skinImage.sprite = data.skinData.modelSprite != null? data.skinData.modelSprite : null;
+        
 
-        if (!data.owned) skinPrice.text = data.skinData.price.ToString();
-        else skinPrice.text = "Owned";
+        if (!data.owned)
+        {
+            skinPrice.text = data.skinData.price.ToString();
+        }
+        else
+        {
+            if (data.used)
+                skinPrice.text = "Used";
+            else
+                skinPrice.text = "Owned";
+        }
     }
 
     private void SelectSkin()

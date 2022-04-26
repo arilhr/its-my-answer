@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skinName: Default
   modelDisplay: {fileID: 1216795493043541168, guid: dce7a022c85310c4fa97cd3eeddc4aba, type: 3}
+  modelSprite: {fileID: 21300000, guid: c75dcf755f9b2e14286218c7a4494b08, type: 3}
   modelInGame: {fileID: 8457982498441347452, guid: 02e4b86cfc5d1fc4f8a0076c8377aaaf, type: 3}
   isFree: 1
   price: 0

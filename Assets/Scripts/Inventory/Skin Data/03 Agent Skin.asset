@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skinName: Agent
   modelDisplay: {fileID: 3495811468973008371, guid: 255aec6066670134aadfa4e77db6b505, type: 3}
+  modelSprite: {fileID: 21300000, guid: d877d294000f16a4f8cc87e075f7435e, type: 3}
   modelInGame: {fileID: 3495811468973008371, guid: 255aec6066670134aadfa4e77db6b505, type: 3}
   isFree: 0
   price: 300

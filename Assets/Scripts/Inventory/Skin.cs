@@ -10,6 +10,9 @@ public class Skin : ScriptableObject
     [Tooltip("Model displayed in inventory")]
     public GameObject modelDisplay;
 
+    [Tooltip("Image model")]
+    public Sprite modelSprite;
+
     [Tooltip("Model used in game")]
     public GameObject modelInGame;
 
