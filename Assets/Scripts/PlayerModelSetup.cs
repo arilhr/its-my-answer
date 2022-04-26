@@ -14,5 +14,7 @@ public class PlayerModelSetup : MonoBehaviour
 
         if (player != null)
             transform.SetParent(player.transform);
+
+        transform.localPosition = Vector3.zero;
     }
 }
