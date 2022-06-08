@@ -24,7 +24,7 @@ public class AccountManager : Singleton<AccountManager>
         username = PlayerPrefs.GetString(UNAME_KEY);
         if (username == string.Empty || deactiveLoadUsername)
         {
-            SetUsername($"Player {Random.Range(0, 1000)}");
+            SetUsername($"P-{Random.Range(0, 1000)}");
         }
         else
         {

@@ -48,9 +48,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public void ConfirmInputUsername()
     {
-        if (inputUsernameField.text.Length < 6) return;
+        if (inputUsernameField.text.Length > 8) return;
 
-        PhotonNetwork.NickName = inputUsernameField.text;
+        AccountManager.Instance.SetUsername(inputUsernameField.text);
         inputUsernamePanel.SetActive(false);
         menuPanel.SetActive(true);
 

@@ -58,14 +58,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void Start()
     {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            PhotonNetwork.Instantiate(playerPrefabs.name, spawnPoints[0].position, Quaternion.identity);
-        }
-        else
-        {
-            PhotonNetwork.Instantiate(playerPrefabs.name, spawnPoints[1].position, Quaternion.identity);
-        }
+        PhotonNetwork.Instantiate(playerPrefabs.name, spawnPoints[PhotonNetwork.LocalPlayer.ActorNumber - 1].position, Quaternion.identity);
 
         Hashtable props = new Hashtable
         {
