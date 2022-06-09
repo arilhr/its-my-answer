@@ -173,17 +173,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""70c45e92-6901-4b70-acfb-cbad9aff1ac6"",
-                    ""path"": ""<Touchscreen>/delta"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Look"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""559e7ae1-54f6-4182-9940-911c7ecf2446"",
                     ""path"": ""<Keyboard>/j"",
                     ""interactions"": """",

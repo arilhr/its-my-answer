@@ -11,7 +11,8 @@
                     "id": "8c0ed59a-5c47-41fd-92f5-e178eaf97912",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Jump",
@@ -19,7 +20,8 @@
                     "id": "5fbb073d-dd9e-4cd5-b2a8-56ab9423fbae",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Look",
@@ -27,7 +29,8 @@
                     "id": "18e7b1db-e576-4160-bdb4-57c533a2b947",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Pick",
@@ -35,7 +38,8 @@
                     "id": "44f96cbc-fd12-49d7-89a5-1737d62cb07b",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Drop",
@@ -43,7 +47,8 @@
                     "id": "4de972ce-981e-4392-83fa-9f3bb2e99564",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Punch",
@@ -51,7 +56,8 @@
                     "id": "ff42cead-2a4c-46e7-9722-a1fdb71356a5",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -136,17 +142,6 @@
                     "name": "",
                     "id": "54d7b81e-e2ff-4e61-b4f9-d7523574a956",
                     "path": "<Gamepad>/rightStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "70c45e92-6901-4b70-acfb-cbad9aff1ac6",
-                    "path": "<Touchscreen>/delta",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
