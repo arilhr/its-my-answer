@@ -5,17 +5,25 @@ using UnityEngine;
 
 public class PlayerAnswer : MonoBehaviour
 {
-    public TMP_Text answerText;
+    public List<TMP_Text> answerText;
 
     public void SetAnswerPicked(int answer)
     {
-        answerText.text = answer.ToString();
+        SetAnswerTextUI(answer.ToString());
         gameObject.SetActive(true);
     }
 
     public void SetAnswerDropped()
     {
-        answerText.text = "";
+        SetAnswerTextUI("");
         gameObject.SetActive(false);
+    }
+
+    public void SetAnswerTextUI(string answer)
+    {
+        foreach (TMP_Text t in answerText)
+        {
+            t.text = answer;
+        }
     }
 }

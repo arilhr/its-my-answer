@@ -7,7 +7,7 @@ using TMPro;
 
 public class AnswerItem : MonoBehaviour, IPickable
 {
-    public TMP_Text answerText;
+    public List<TMP_Text> answerText;
     public PhotonView pv;
 
     private PlayerController currentCarrier;
@@ -31,7 +31,7 @@ public class AnswerItem : MonoBehaviour, IPickable
     public void SetItemAnswer(int answer)
     {
         this.answer = answer;
-        answerText.text = answer.ToString();
+        SetCurrentAnswerTextUI();
 
         pv.RPC("RpcSetItemAnswer", RpcTarget.All, answer);
     }
@@ -40,7 +40,15 @@ public class AnswerItem : MonoBehaviour, IPickable
     private void RpcSetItemAnswer(int answer)
     {
         this.answer = answer;
-        answerText.text = answer.ToString();
+        SetCurrentAnswerTextUI();
+    }
+    
+    public void SetCurrentAnswerTextUI()
+    {
+        foreach (TMP_Text t in answerText)
+        {
+            t.text = answer.ToString();
+        }
     }
 
     public void Picked(PlayerController player)
