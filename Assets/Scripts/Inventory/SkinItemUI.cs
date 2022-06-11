@@ -12,6 +12,8 @@ public class SkinItemUI : MonoBehaviour
     public TMP_Text skinPrice;
     public Button selectButton;
 
+    SkinInventoryData data;
+
     private void Start()
     {
         UpdateUI();
@@ -32,9 +34,9 @@ public class SkinItemUI : MonoBehaviour
     private void UpdateUI()
     {
         if (InventoryManager.Instance == null) return;
-
-        SkinInventoryData data = InventoryManager.Instance.skins[indexSkin];
-
+        
+        data = InventoryManager.Instance.skins[indexSkin];
+        
         skinName.text = data.skinData.skinName;
         skinImage.sprite = data.skinData.modelSprite != null? data.skinData.modelSprite : null;
         
@@ -56,15 +58,27 @@ public class SkinItemUI : MonoBehaviour
     {
         if (InventoryManager.Instance == null) return;
 
-        SkinInventoryData data = InventoryManager.Instance.skins[indexSkin];
-
         if (data.owned)
         {
             InventoryManager.Instance.ChangeUsedSkin(indexSkin);
         }
         else
         {
-            BuySkin();
+            SkinSelection skinSelectUI = GetComponentInParent<SkinSelection>();
+            AlertPanel alert = skinSelectUI.alertPanel;
+
+            // not enough coins
+            if (CurrencyManager.Instance.currencies.coins < data.skinData.price)
+            {
+                alert.ShowAlert(AlertType.INFO, "Not enough coins");
+                return;
+            }
+
+            // show buy skin confirmation
+            alert.ShowAlert(AlertType.CONFIRMATION, $"Are you sure you want to buy skin {data.skinData.name}?", () =>
+            {
+                BuySkin();
+            }, null);
         }
     }
 
@@ -72,8 +86,10 @@ public class SkinItemUI : MonoBehaviour
     {
         if (InventoryManager.Instance == null) return;
 
-        // TODO: check player has enough money
+        // subtract coins
+        CurrencyManager.Instance.SubtractCoins(data.skinData.price);
 
+        // change skin data that bough
         InventoryManager.Instance.ChangeSkinInventoryData(indexSkin, true, false);
 
         Debug.Log($"Skin {skinName.text} bought");

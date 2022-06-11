@@ -6,6 +6,7 @@ public class SkinSelection : MonoBehaviour
 {
     public Transform skinItemParent;
     public GameObject skinItemUI;
+    public AlertPanel alertPanel;
 
     private void Start()
     {
