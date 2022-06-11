@@ -14,7 +14,7 @@ public class SkinDisplay : MonoBehaviour
         UpdateDisplay();
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         if (InventoryManager.Instance != null) InventoryManager.Instance.onChangedSkin -= UpdateDisplay;
     }
@@ -30,6 +30,6 @@ public class SkinDisplay : MonoBehaviour
 
         currentShowedSkin = Instantiate(InventoryManager.Instance.GetUsedSkin().modelDisplay, skinDisplayParent);
 
-        Debug.Log($"Update skin display");
+        Debug.Log($"Update skin display to {currentShowedSkin.name}");
     }
 }
