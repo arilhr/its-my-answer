@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private Transform playerCamera;
     public PlayerInput input { private set; get; }
 
+    private Vector3 initialPos;
+
     [Header("Item Pick Properties")]
     public bool itemPickGizmos = true;
     public Vector3 itemPickArea;
@@ -108,6 +110,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             // spawn player model skin
             GameObject playerModel = PhotonNetwork.Instantiate("Player Models/" + InventoryManager.Instance.GetUsedSkin().modelInGame.name, transform.position, Quaternion.identity);
             animator = playerModel.GetComponent<Animator>();
+
+            initialPos = transform.position;
         }
 
         // set name player ui
@@ -314,6 +318,25 @@ public class PlayerController : MonoBehaviourPunCallbacks
     }
 
     #endregion
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (!pv.IsMine) return;
+        
+        if (other.gameObject.CompareTag("BottomBorder"))
+        {
+            Debug.Log($"Player hit bottom border");
+            
+            if (currentItemPicked != null)
+            {
+                AnswerItem itemToRespawn = currentItemPicked;
+                DropItem();
+                itemToRespawn.RandomizePosition();
+            }
+
+            transform.position = initialPos;
+        }
+    }
 
     #region Callback
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

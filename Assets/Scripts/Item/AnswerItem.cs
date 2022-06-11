@@ -88,4 +88,14 @@ public class AnswerItem : MonoBehaviour, IPickable
     {
         transform.position = QuestionGenerator.Instance.GetRandomSpawnAnswerPos();
     }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (!pv.AmOwner) return;
+
+        if (other.CompareTag("BottomBorder") && !isPicked)
+        {
+            RandomizePosition();
+        }
+    }
 }
