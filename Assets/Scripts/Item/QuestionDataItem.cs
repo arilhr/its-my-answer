@@ -63,6 +63,9 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
 
         player.DropItem();
         answerPicked.SetItemActive(false);
+
+        // play correct audio
+        QuestionSFX.Instance.PlayCorrectSFX();
     }
 
     private void FalseAnswer(PlayerController answerer)
@@ -81,5 +84,8 @@ public class QuestionDataItem : MonoBehaviourPunCallbacks
         AnswerItem answerItem = player.currentItemPicked;
         player.DropItem();
         answerItem?.RandomizePosition();
+
+        // play false audio
+        QuestionSFX.Instance.PlayFalseSFX();
     }
 }
