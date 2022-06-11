@@ -35,6 +35,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private Vector3 initialPos;
 
+    private PlayerAudio playerAudio;
+
     [Header("Item Pick Properties")]
     public bool itemPickGizmos = true;
     public Vector3 itemPickArea;
@@ -58,9 +60,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public bool showPickAnswerArea = false;
     public bool showPunchArea = false;
     public GameObject playerModelTest;
-
-
-    
 
     private void Awake()
     {
@@ -110,6 +109,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             // spawn player model skin
             GameObject playerModel = PhotonNetwork.Instantiate("Player Models/" + InventoryManager.Instance.GetUsedSkin().modelInGame.name, transform.position, Quaternion.identity);
             animator = playerModel.GetComponent<Animator>();
+
+            playerAudio = GetComponent<PlayerAudio>();
 
             initialPos = transform.position;
         }
@@ -171,6 +172,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (IsGrounded())
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            playerAudio.PlayJumpAudio();
         }
     }
 
