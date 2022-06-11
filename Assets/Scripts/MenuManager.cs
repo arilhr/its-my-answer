@@ -23,6 +23,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
     [Header("Properties")]
     public byte playerToPlay;
 
+    [Header("Input Username")]
+    private int minUsername = 3;
+    private int maxusername = 8;
+
     [Scene]
     public string gameScene;
 
@@ -48,7 +52,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public void ConfirmInputUsername()
     {
-        if (inputUsernameField.text.Length > 8) return;
+        if (inputUsernameField.text.Length < minUsername) return;
+        if (inputUsernameField.text.Length > maxusername) return;
 
         AccountManager.Instance.SetUsername(inputUsernameField.text);
         inputUsernamePanel.SetActive(false);
