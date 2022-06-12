@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public enum AlertType
@@ -21,12 +23,23 @@ public class AlertPanel : MonoBehaviour
     public Button cancelButton;
     public Button closeButton;
 
+    private UnityEvent OnConfirmButton = new UnityEvent();
+    private UnityEvent OnCancelButton = new UnityEvent();
+    private UnityEvent OnCloseButton = new UnityEvent();
+
     private void Awake()
     {
         CloseAlert();
     }
 
-    public void ShowAlert(AlertType type, string message, System.Action confirmAction = null, System.Action cancelAction = null, System.Action closeAction = null)
+    private void Start()
+    {
+        confirmButton.onClick.AddListener(() => OnConfirmButton?.Invoke());
+        cancelButton.onClick.AddListener(() => OnCancelButton?.Invoke());
+        closeButton.onClick.AddListener(() => OnCloseButton?.Invoke());
+    }
+
+    public void ShowAlert(AlertType type, string message, Action confirmAction = null, Action cancelAction = null, Action closeAction = null)
     {
         // set message
         messageText.text = message;
@@ -35,7 +48,7 @@ public class AlertPanel : MonoBehaviour
         switch (type)
         {
             case AlertType.INFO:
-                closeButton.onClick.AddListener(() =>
+                OnCloseButton.AddListener(() =>
                 {
                     closeAction?.Invoke();
                     CloseAlert();
@@ -43,12 +56,12 @@ public class AlertPanel : MonoBehaviour
                 closeButton.gameObject.SetActive(true);
                 break;
             case AlertType.CONFIRMATION:
-                confirmButton.onClick.AddListener(() =>
+                OnConfirmButton.AddListener(() =>
                 {
                     confirmAction?.Invoke();
                     CloseAlert();
                 });
-                cancelButton.onClick.AddListener(() =>
+                OnCancelButton.AddListener(() =>
                 {
                     cancelAction?.Invoke();
                     CloseAlert();
@@ -68,9 +81,9 @@ public class AlertPanel : MonoBehaviour
         confirmButton.gameObject.SetActive(false);
         cancelButton.gameObject.SetActive(false);
         closeButton.gameObject.SetActive(false);
-        confirmButton.onClick.RemoveAllListeners();
-        cancelButton.onClick.RemoveAllListeners();
-        closeButton.onClick.RemoveAllListeners();
+        OnConfirmButton.RemoveAllListeners();
+        OnCancelButton.RemoveAllListeners();
+        OnCloseButton.RemoveAllListeners();
 
         // hide alert panel
         alertPanel.SetActive(false);
